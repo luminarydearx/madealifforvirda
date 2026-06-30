@@ -1017,7 +1017,7 @@ function saveFormDataToSettings() {
 function updatePricingFromModal() {
     if (window.pricingCalculator) {
         const currentModalSettings = {
-            music: document.getElementById('backgroundMusic')?.value || './music/happybirtday_uia.mp3',
+            music: document.getElementById('backgroundMusic')?.value || './music/hbdmusic1.mp3',
             enableBook: document.getElementById('enableBook')?.value === 'true',
             enableHeart: document.getElementById('enableHeart')?.value === 'true',
             isSave: document.getElementById('isSave')?.checked || false,
@@ -1344,7 +1344,7 @@ if (languageSwitchBtn) {
 
             // ✅ Sửa logic enableBook và enableHeart
             window.settings = {
-                music: serverSettings.music || './music/happybirtday_uia.mp3',
+                music: serverSettings.music || './music/hbdmusic1.mp3',
                 countdown: serverSettings.countdown || 3,
                 matrixText: serverSettings.matrixText || 'HAPPYBIRTHDAY',
                 matrixColor1: serverSettings.matrixColor1 || '#ffb6c1',

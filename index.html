@@ -316,10 +316,29 @@
             </div>
         </div>
 
-        <audio id="birthdayAudio" loop>
-            <source src="music/happybirtday_uia.mp3" type="audio/mpeg">
+        <audio id="birthdayAudio" loop autoplay>
+            <source src="music/hbdmusic1.mp3" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
+
+        <!-- Start Screen Overlay - ditampilkan saat autoplay musik di-block browser -->
+        <div id="startScreenOverlay" class="start-screen-overlay">
+            <div class="start-screen-card">
+                <div class="start-screen-icon">
+                    <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13" />
+                        <circle cx="6" cy="18" r="3" />
+                        <circle cx="18" cy="16" r="3" />
+                    </svg>
+                </div>
+                <div class="start-screen-title">Made For Yulia Virda</div>
+                <div class="start-screen-subtitle">Tekan untuk memulai<br>don't forget to turn on your sound 🔊</div>
+                <button id="startScreenBtn" class="start-screen-btn">
+                    <span class="start-screen-btn-icon">▶</span>
+                    <span>Mulai</span>
+                </button>
+            </div>
+        </div>
 
         <div id="orientation-lock">
             <div class="phone-icon">

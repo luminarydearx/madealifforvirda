@@ -1592,21 +1592,163 @@ let isPlaying = false;
 
 birthdayAudio.volume = 0.6;
 
-function toggleMusic() {
-    if (isPlaying) {
-        birthdayAudio.pause();
+/**
+ * Strategi Autoplay Musik Multi-Layer
+ * =====================================
+ * Browser modern (Chrome, Safari, Firefox) memblokir autoplay audio dengan suara
+ * sebelum ada user interaction. Strategi kita:
+ *
+ * Layer 1: Coba play() langsung saat page load (kadang succeed di desktop
+ *          jika user sudah pernah interact dengan domain ini sebelumnya)
+ * Layer 2: Pasang listener ke gesture pertama user (click/touch/keydown/scroll)
+ *          di mana saja di halaman - gesture ini akan unlock audio
+ * Layer 3: Tampilkan start screen overlay dengan tombol "Mulai" sebagai
+ *          fallback kalau Layer 1 & 2 tidak berhasil dalam waktu tertentu
+ */
+
+let musicStarted = false;
+let startOverlayShown = false;
+const startScreenOverlay = document.getElementById('startScreenOverlay');
+const startScreenBtn = document.getElementById('startScreenBtn');
+
+/**
+ * Update UI music control (icon play/pause)
+ */
+function updateMusicUI(isPlayingState) {
+    if (!musicControl) return;
+    if (isPlayingState) {
+        musicControl.innerHTML = '⏸';
+        musicControl.classList.add('playing');
+        musicControl.title = 'Pause Music';
+    } else {
         musicControl.innerHTML = '▶';
         musicControl.classList.remove('playing');
         musicControl.title = 'Play Music';
+    }
+}
+
+/**
+ * Coba mulai musik. Return true kalau berhasil, false kalau di-block browser.
+ */
+function tryStartMusic() {
+    if (musicStarted || !birthdayAudio) return musicStarted;
+
+    const playPromise = birthdayAudio.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+        playPromise.then(() => {
+            // Berhasil! Tandai started dan sembunyikan overlay kalau ada
+            musicStarted = true;
+            isPlaying = true;
+            updateMusicUI(true);
+            hideStartScreen();
+        }).catch(error => {
+            // Di-block browser. Overlay akan muncul otomatis lewat timeout.
+            console.log('Autoplay di-block browser, menunggu user interaction:', error.name);
+        });
+    } else {
+        // Browser lama (synchronous)
+        musicStarted = true;
+        isPlaying = true;
+        updateMusicUI(true);
+        hideStartScreen();
+    }
+    return musicStarted;
+}
+
+/**
+ * Sembunyikan start screen overlay dengan animasi
+ */
+function hideStartScreen() {
+    if (startScreenOverlay && !startScreenOverlay.classList.contains('hidden')) {
+        startScreenOverlay.classList.add('hidden');
+        // Hapus dari DOM setelah animasi selesai
+        setTimeout(() => {
+            if (startScreenOverlay && startScreenOverlay.parentNode) {
+                startScreenOverlay.parentNode.removeChild(startScreenOverlay);
+            }
+        }, 900);
+    }
+}
+
+/**
+ * Tampilkan start screen overlay (dipanggil jika autoplay di-block)
+ */
+function showStartScreen() {
+    if (startOverlayShown) return;
+    startOverlayShown = true;
+    if (startScreenOverlay && startScreenOverlay.classList.contains('hidden')) {
+        startScreenOverlay.classList.remove('hidden');
+    }
+}
+
+// Layer 1: Coba autoplay langsung saat script di-load
+// Beri delay kecil supaya audio element selesai parse source-nya
+setTimeout(() => {
+    tryStartMusic();
+
+    // Layer 3: Kalau setelah 1.5 detik musik belum mulai, tampilkan overlay
+    setTimeout(() => {
+        if (!musicStarted) {
+            showStartScreen();
+        }
+    }, 1500);
+}, 300);
+
+// Layer 2: Pasang listener ke gesture pertama user di mana saja di halaman
+// Ini akan unlock audio playback di browser modern
+const firstInteractionEvents = ['click', 'touchstart', 'keydown', 'pointerdown'];
+let firstInteractionHandler = null;
+
+firstInteractionHandler = function () {
+    if (!musicStarted) {
+        tryStartMusic();
+        // Setelah berhasil, hapus semua listener
+        if (musicStarted) {
+            firstInteractionEvents.forEach(evt => {
+                document.removeEventListener(evt, firstInteractionHandler, true);
+            });
+            hideStartScreen();
+        }
+    }
+};
+
+firstInteractionEvents.forEach(evt => {
+    document.addEventListener(evt, firstInteractionHandler, { capture: true, passive: true, once: false });
+});
+
+// Listener khusus untuk tombol "Mulai" di start screen overlay
+if (startScreenBtn) {
+    startScreenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Force unlock audio context dengan user gesture eksplisit
+        tryStartMusic();
+        hideStartScreen();
+    });
+}
+
+// Listener juga untuk klik di area overlay (selain tombol)
+if (startScreenOverlay) {
+    startScreenOverlay.addEventListener('click', (e) => {
+        if (e.target === startScreenOverlay) {
+            tryStartMusic();
+            hideStartScreen();
+        }
+    });
+}
+
+function toggleMusic() {
+    if (isPlaying) {
+        birthdayAudio.pause();
+        updateMusicUI(false);
         isPlaying = false;
     } else {
         birthdayAudio.play().then(() => {
-            musicControl.innerHTML = '⏸';
-            musicControl.classList.add('playing');
-            musicControl.title = 'Pause Music';
+            updateMusicUI(true);
             isPlaying = true;
+            musicStarted = true;
         }).catch(error => {
-            // alert('Click to play music!');
+            // Autoplay masih di-block, tampilkan start screen lagi
+            showStartScreen();
         });
     }
 }
@@ -1809,18 +1951,17 @@ window.debugBookImages = function() {
 };
 
 // Memaksa musik menyala pada interaksi fisik pertama (Klik / Swipe) di area buku
+// (Sudah ditangani oleh firstInteractionHandler global - listener di sini
+//  sebagai backup khusus untuk area book di Safari/iOS yang lebih ketat)
 if (book) {
     const forcePlayMusic = () => {
-        if (!isPlaying && birthdayAudio) {
+        if (!musicStarted && birthdayAudio) {
             // Perintah play() langsung dieksekusi saat jari menyentuh layar (tanpa setTimeout)
             birthdayAudio.play().then(() => {
-                const musicControl = document.getElementById('musicControl');
-                if(musicControl) {
-                    musicControl.innerHTML = '⏸';
-                    musicControl.classList.add('playing');
-                    musicControl.title = 'Pause Music';
-                }
+                musicStarted = true;
                 isPlaying = true;
+                updateMusicUI(true);
+                hideStartScreen();
             }).catch(error => {
                 console.log("Safari memblokir:", error);
             });
