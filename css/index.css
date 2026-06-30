@@ -1550,28 +1550,30 @@
       transform: translateY(-50%);
       max-width: 22vw;
       width: 22vw;
-      padding: 18px 22px;
-      font-family: 'Dancing Script', 'Pacifico', cursive;
-      font-size: 22px;
-      font-weight: 600;
-      line-height: 1.45;
+      padding: 22px 26px;
+      /* Ganti ke Poppins - clean, modern, sangat readable */
+      font-family: 'Poppins', 'Quicksand', system-ui, -apple-system, sans-serif;
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.55;
+      letter-spacing: 0.2px;
       text-align: center;
       color: #ffffff;
       background: linear-gradient(135deg,
-          rgba(255, 105, 180, 0.18),
-          rgba(255, 20, 147, 0.12));
-      border: 2px solid rgba(255, 105, 180, 0.55);
+          rgba(255, 105, 180, 0.22),
+          rgba(255, 20, 147, 0.16));
+      border: 2px solid rgba(255, 105, 180, 0.65);
       border-radius: 18px;
       box-shadow:
           0 0 22px rgba(255, 105, 180, 0.55),
           0 0 45px rgba(255, 20, 147, 0.35),
           inset 0 0 18px rgba(255, 105, 180, 0.15);
       text-shadow:
-          0 0 8px #ff69b4,
-          0 0 16px #ff1493,
-          0 0 24px rgba(255, 20, 147, 0.7);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+          0 1px 2px rgba(0, 0, 0, 0.85),
+          0 0 10px rgba(255, 105, 180, 0.9),
+          0 0 20px rgba(255, 20, 147, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       z-index: 305;
       opacity: 0;
       pointer-events: none;
@@ -1607,9 +1609,9 @@
       .side-message {
           max-width: 26vw;
           width: 26vw;
-          padding: 10px 12px;
-          font-size: 14px;
-          line-height: 1.35;
+          padding: 12px 14px;
+          font-size: 13px;
+          line-height: 1.4;
           border-radius: 12px;
           border-width: 1.5px;
       }
@@ -1628,8 +1630,8 @@
       .side-message {
           max-width: 24vw;
           width: 24vw;
-          font-size: 18px;
-          padding: 14px 16px;
+          font-size: 16px;
+          padding: 16px 18px;
       }
   }
 
@@ -1651,6 +1653,191 @@
 
   .side-message.show {
       animation: sideMessagePulse 3.2s ease-in-out infinite;
+  }
+
+  /* ============================================= */
+  /* Book Hint - panduan geser buku                */
+  /* ============================================= */
+
+  .book-hint {
+      position: fixed;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      font-family: 'Poppins', 'Quicksand', system-ui, sans-serif;
+      color: #ffffff;
+      background: linear-gradient(135deg,
+          rgba(255, 105, 180, 0.25),
+          rgba(255, 20, 147, 0.18));
+      border: 2px solid rgba(255, 105, 180, 0.7);
+      border-radius: 16px;
+      box-shadow:
+          0 0 20px rgba(255, 105, 180, 0.5),
+          0 0 40px rgba(255, 20, 147, 0.3);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      text-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.8),
+          0 0 10px rgba(255, 105, 180, 0.8);
+      z-index: 9000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      max-width: 200px;
+      text-align: center;
+  }
+
+  .book-hint.show {
+      display: flex;
+      opacity: 1;
+      animation: bookHintFloat 2.2s ease-in-out infinite;
+  }
+
+  .book-hint-icon {
+      color: #ffeb3b;
+      filter: drop-shadow(0 0 6px rgba(255, 235, 59, 0.9))
+              drop-shadow(0 0 12px rgba(255, 105, 180, 0.7));
+      animation: bookHintArrow 1.6s ease-in-out infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .book-hint-text {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: 0.3px;
+  }
+
+  .book-hint-sub {
+      font-size: 11px;
+      font-weight: 400;
+      opacity: 0.85;
+      line-height: 1.3;
+      margin-top: 2px;
+  }
+
+  /* Versi desktop: di sebelah kiri buku */
+  /* Position by right edge supaya selalu di kiri book tidak overlap */
+  #bookHint {
+      top: 50%;
+      right: calc(50% + 320px); /* 300 (half book width) + 20 (gap) */
+      transform: translateY(-50%) translateX(30px);
+      max-width: 200px;
+  }
+
+  #bookHint.show {
+      transform: translateY(-50%) translateX(0);
+  }
+
+  /* Hidden by default di mobile - tampilkan versi mobile saja */
+  #bookHintMobile {
+      display: none;
+  }
+
+  /* Animasi panah bergerak ke kanan (menunjuk ke buku) */
+  @keyframes bookHintArrow {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(6px); }
+  }
+
+  /* Animasi float lembut untuk hint container */
+  @keyframes bookHintFloat {
+      0%, 100% { 
+          box-shadow:
+              0 0 20px rgba(255, 105, 180, 0.5),
+              0 0 40px rgba(255, 20, 147, 0.3);
+      }
+      50% { 
+          box-shadow:
+              0 0 28px rgba(255, 105, 180, 0.7),
+              0 0 55px rgba(255, 20, 147, 0.45);
+      }
+  }
+
+  /* Responsive: mobile landscape (HP di mode landscape) */
+  /* Di mobile, letakkan hint di bawah buku karena space horizontal terbatas */
+  @media screen and (max-height: 500px) and (orientation: landscape) {
+      #bookHint {
+          display: none !important;
+      }
+
+      #bookHintMobile {
+          display: none;
+          position: fixed;
+          bottom: 8px;
+          left: 50%;
+          transform: translateX(-50%) translateY(20px);
+          flex-direction: row;
+          gap: 10px;
+          padding: 8px 14px;
+          max-width: 280px;
+      }
+
+      #bookHintMobile.show {
+          display: flex;
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+      }
+
+      #bookHintMobile .book-hint-text {
+          font-size: 12px;
+          line-height: 1.25;
+      }
+
+      #bookHintMobile .book-hint-icon svg {
+          width: 22px;
+          height: 22px;
+      }
+  }
+
+  /* Tablet portrait / small laptop */
+  @media screen and (max-width: 1024px) and (min-height: 501px) {
+      #bookHint {
+          right: calc(50% + 240px); /* smaller book on tablet, less gap */
+          max-width: 170px;
+          padding: 10px 14px;
+      }
+
+      #bookHint .book-hint-text {
+          font-size: 12px;
+      }
+
+      #bookHint .book-hint-sub {
+          font-size: 10px;
+      }
+  }
+
+  /* Mobile portrait (walaupun biasanya di-lock ke landscape) */
+  @media screen and (max-width: 600px) and (orientation: portrait) {
+      #bookHint {
+          display: none !important;
+      }
+
+      #bookHintMobile {
+          display: none;
+          position: fixed;
+          bottom: 12px;
+          left: 50%;
+          transform: translateX(-50%) translateY(20px);
+          flex-direction: row;
+          gap: 10px;
+          padding: 10px 16px;
+          max-width: 90vw;
+      }
+
+      #bookHintMobile.show {
+          display: flex;
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+      }
+
+      #bookHintMobile .book-hint-text {
+          font-size: 13px;
+      }
   }
 
  

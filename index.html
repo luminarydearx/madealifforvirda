@@ -33,6 +33,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css?family=Pacifico&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 </head>
@@ -126,6 +128,33 @@
         <div class="firework-container" id="fireworkContainer"></div>
         <div class="book-container">
             <div class="book" id="book"></div>
+        </div>
+
+        <!-- Book flip hint - tells reader to swipe/click to flip pages -->
+        <div id="bookHint" class="book-hint">
+            <div class="book-hint-icon">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </div>
+            <div class="book-hint-text">
+                Geser halaman buku<br>untuk membuka
+            </div>
+            <div class="book-hint-sub">
+                klik / swipe ke kanan
+            </div>
+        </div>
+
+        <!-- Mobile version of book hint (shown only on small screens) -->
+        <div id="bookHintMobile" class="book-hint book-hint-mobile">
+            <div class="book-hint-icon">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            </div>
+            <div class="book-hint-text">
+                Geser buku<br>untuk membuka
+            </div>
         </div>
 
         <button class="music-control" id="musicControl" title="Play/Pause Music">

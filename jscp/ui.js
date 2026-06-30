@@ -949,7 +949,7 @@ function showBook() {
 
         // ✅ FIX: Tính toán z-index cho tất cả pages
         calculatePageZIndexes();
-        
+
         // ✅ FIX: Thiết lập observer để theo dõi thay đổi cấu trúc book
         setupPageObserver();
 
@@ -968,10 +968,56 @@ function showBook() {
                         toggleMusic();
                     }
                 }, 800);
+
+                // Tampilkan panduan "geser buku" setelah buku muncul
+                setTimeout(() => {
+                    showBookHint();
+                }, 1400);
             });
         });
     }
 
+}
+
+/**
+ * Tampilkan panduan geser buku di sisi kiri (desktop) / bawah (mobile).
+ * Otomatis memilih versi yang sesuai berdasarkan ukuran layar.
+ */
+function showBookHint() {
+    // Jangan tampilkan kalau buku sudah selesai / heart effect berjalan
+    if (typeof isBookFinished !== 'undefined' && isBookFinished) return;
+
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isLandscapeMobile = isMobile && window.innerHeight <= 500 && window.innerWidth > window.innerHeight;
+    const isPortraitMobile = isMobile && window.innerWidth <= 600 && window.innerHeight > window.innerWidth;
+
+    const desktopHint = document.getElementById('bookHint');
+    const mobileHint = document.getElementById('bookHintMobile');
+
+    if (isLandscapeMobile || isPortraitMobile) {
+        if (mobileHint) {
+            mobileHint.classList.add('show');
+        }
+    } else {
+        if (desktopHint) {
+            desktopHint.classList.add('show');
+        }
+    }
+}
+
+/**
+ * Sembunyikan panduan geser buku (dipanggil saat user mulai interaksi).
+ */
+function hideBookHint() {
+    const desktopHint = document.getElementById('bookHint');
+    const mobileHint = document.getElementById('bookHintMobile');
+
+    if (desktopHint) {
+        desktopHint.classList.remove('show');
+    }
+    if (mobileHint) {
+        mobileHint.classList.remove('show');
+    }
 }
 function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -1145,6 +1191,11 @@ function startHeartEffect() {
         return;
     }
 
+    // Sembunyikan panduan geser buku (sudah selesai baca buku)
+    if (typeof hideBookHint === 'function') {
+        hideBookHint();
+    }
+
     // Batch DOM updates
     const book = document.getElementById('book');
     const bookContainer = document.querySelector('.book-container');
@@ -1283,6 +1334,8 @@ function nextPage() {
     const totalPhysicalPages = Math.ceil(pages.length / 2);
     if (currentPage < totalPhysicalPages - 1 && !isFlipping) {
         isFlipping = true;
+        // Sembunyikan panduan geser buku saat user mulai berinteraksi
+        if (typeof hideBookHint === 'function') hideBookHint();
         const pageToFlip = document.querySelector(`.page[data-page="${currentPage}"]`);
         pageToFlip.classList.add('flipping');
         setTimeout(() => {
@@ -1297,6 +1350,8 @@ function nextPage() {
         const lastPage = document.querySelector(`.page[data-page="${currentPage}"]`);
         if (lastPage && !lastPage.classList.contains('flipped')) {
             isFlipping = true;
+            // Sembunyikan panduan geser buku saat user mulai berinteraksi
+            if (typeof hideBookHint === 'function') hideBookHint();
             lastPage.classList.add('flipping');
             setTimeout(() => {
                 lastPage.classList.remove('flipping');
@@ -1312,6 +1367,8 @@ function nextPage() {
 function prevPage() {
     if (currentPage > 0 && !isFlipping) {
         isFlipping = true;
+        // Sembunyikan panduan geser buku saat user mulai berinteraksi
+        if (typeof hideBookHint === 'function') hideBookHint();
         currentPage--;
         const pageToFlip = document.querySelector(`.page[data-page="${currentPage}"]`);
         pageToFlip.classList.add('flipping');
@@ -1636,6 +1693,11 @@ function cleanup() {
     // Sembunyikan pesan samping (kiri & kanan)
     if (typeof hideSideMessages === 'function') {
         hideSideMessages();
+    }
+
+    // Sembunyikan panduan geser buku
+    if (typeof hideBookHint === 'function') {
+        hideBookHint();
     }
 
     // ✅ FIX: Reset z-index properties

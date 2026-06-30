@@ -277,6 +277,16 @@ function resetWebsiteState() {
         if (sideRight) sideRight.classList.remove('show');
     }
 
+    // Sembunyikan panduan geser buku saat reset
+    if (typeof hideBookHint === 'function') {
+        hideBookHint();
+    } else {
+        const bookHint = document.getElementById('bookHint');
+        const bookHintMobile = document.getElementById('bookHintMobile');
+        if (bookHint) bookHint.classList.remove('show');
+        if (bookHintMobile) bookHintMobile.classList.remove('show');
+    }
+
     // Reset canvas visibility
     if (canvas) {
         canvas.style.display = 'block';
